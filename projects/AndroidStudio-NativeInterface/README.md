@@ -7,7 +7,7 @@ on Android.
 ## Compiling
 
 First you need to generate the aar file using the
-[SQLite-Android-Bindings](../../wrappers/SQLite_Android_Bindings).
+[SQLite Android Bindings](../../wrappers/SQLite_Android_Bindings).
 
 Then copy the generated file to the `aergolite-release` folder:
 
