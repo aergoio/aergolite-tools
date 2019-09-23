@@ -44,7 +44,7 @@ public class MyApplication extends Application {
             File dbfile = new File(getFilesDir(), "test.db");
             //File dbfile = currentActivity.getApplicationContext().getDatabasePath("test.db");
             //String uriStr = dbfile.getAbsolutePath();
-            String uriStr = "file:" + dbfile.getAbsolutePath() + "?blockchain=on&discovery=local:4329";
+            String uriStr = "file:" + dbfile.getAbsolutePath() + "?blockchain=on&discovery=local:4329&num_nodes=3";
             //String uriStr = "file:" + dbfile.getAbsolutePath();
 
             //currentActivity.getApplicationContext();
@@ -117,7 +117,12 @@ public class MyApplication extends Application {
         //Snackbar snackbar = Snackbar.make(coordinatorLayout, "Welcome to AndroidHive", Snackbar.LENGTH_LONG);
         //snackbar.show();
 
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        if(this.currentActivity == null){
+            Log.e("", msg);
+            return;
+        }
+
+        AlertDialog alertDialog = new AlertDialog.Builder(this.currentActivity).create();
         alertDialog.setTitle("Error");
         alertDialog.setMessage(msg);
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
