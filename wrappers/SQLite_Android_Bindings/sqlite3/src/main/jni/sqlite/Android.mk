@@ -1,15 +1,21 @@
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := libuv
-LOCAL_SRC_FILES := ../libuv/$(TARGET_ARCH_ABI)/libuv.so
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/libuv/include
-include $(PREBUILT_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
 LOCAL_MODULE := libbinn
 LOCAL_SRC_FILES := ../binn/$(TARGET_ARCH_ABI)/libbinn.so
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/binn/include
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := libuv
+LOCAL_SRC_FILES := ../libuv/$(TARGET_ARCH_ABI)/lib/libuv.so
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/libuv/$(TARGET_ARCH_ABI)/include
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := libsecp256k1-vrf
+LOCAL_SRC_FILES := ../secp256k1-vrf/$(TARGET_ARCH_ABI)/lib/libsecp256k1-vrf.so
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/secp256k1-vrf/$(TARGET_ARCH_ABI)/include
 include $(PREBUILT_SHARED_LIBRARY)
 
 
@@ -25,7 +31,7 @@ LOCAL_CFLAGS += -DSQLITE_THREADSAFE=1
 LOCAL_CFLAGS += -DSQLITE_ENABLE_COLUMN_METADATA
 
 LOCAL_CFLAGS += -DSQLITE_OMIT_BUILTIN_TEST
-LOCAL_CFLAGS += -DSQLITE_OMIT_LOAD_EXTENSION
+#LOCAL_CFLAGS += -DSQLITE_OMIT_LOAD_EXTENSION  -- used by the ledger interface
 
 #Define HAVE_USLEEP, otherwise ALL sleep() calls take at least 1000ms
 LOCAL_CFLAGS += -DHAVE_USLEEP=1
@@ -69,16 +75,17 @@ LOCAL_SRC_FILES:=                             \
 BASE = ../../../../../../../..
 
 LOCAL_SRC_FILES += $(BASE)/core/sqlite3.c
-LOCAL_SRC_FILES += $(BASE)/plugins/mini-raft/mini-raft.c
+LOCAL_SRC_FILES += $(BASE)/plugins/no-leader/no-leader.c
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH) $(LOCAL_PATH)/nativehelper/
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../binn/include
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libuv/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libuv/x86_64/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../secp256k1-vrf/x86_64/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/$(BASE)/core
 
 LOCAL_MODULE:= libsqliteX
 LOCAL_LDLIBS += -ldl -llog 
 
-LOCAL_SHARED_LIBRARIES := libbinn libuv
+LOCAL_SHARED_LIBRARIES := libbinn libuv libsecp256k1-vrf
 
 include $(BUILD_SHARED_LIBRARY)
-
