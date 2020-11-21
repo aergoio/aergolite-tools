@@ -44,7 +44,7 @@ public class MyApplication extends Application {
             File dbfile = new File(getFilesDir(), "test.db");
             //File dbfile = currentActivity.getApplicationContext().getDatabasePath("test.db");
             //String uriStr = dbfile.getAbsolutePath();
-            String uriStr = "file:" + dbfile.getAbsolutePath() + "?blockchain=on&discovery=local:4329&num_nodes=3";
+            String uriStr = "file:" + dbfile.getAbsolutePath() + "?blockchain=on&discovery=local:4329&password=test";
             //String uriStr = "file:" + dbfile.getAbsolutePath();
 
             //currentActivity.getApplicationContext();
@@ -59,7 +59,7 @@ public class MyApplication extends Application {
                 return;
             }
 
-            on_db_ready();
+            handler.postDelayed(check_db, 250);
 
         } catch (java.lang.Exception ex) {
             showMessage("ConnectToDb: " + ex.toString());
@@ -87,6 +87,54 @@ public class MyApplication extends Application {
         }
     };
 
+    Runnable check_db = new Runnable() {
+
+        @Override
+        public void run() {
+            boolean repeat = true;
+            try {
+                if (db_is_ready()) {
+                    //logResult("the db is ready");
+                    on_db_ready();
+                    repeat = false;
+                //} else {
+                //    logResult("the db is not ready");
+                }
+            } catch (Exception e) {
+                showMessage("check_db: " + e.toString());
+                repeat = false;
+            } finally {
+                if (repeat) {
+                    // call the same runnable again
+                    handler.postDelayed(this, 250);
+                }
+            }
+        }
+    };
+
+    public boolean db_is_ready() {
+
+        try {
+            String result;
+
+            try {
+                SQLiteStatement statement = db.compileStatement("PRAGMA db_is_ready");
+                result = statement.simpleQueryForString();
+                statement.close();
+            } catch (SQLiteException ex) {
+                showMessage("prepare statement: " + ex.toString());
+                db.close();
+                return false;
+            }
+
+            return result.equals("1");
+
+        } catch (java.lang.Exception ex) {
+            showMessage("db_is_ready: " + ex.toString());
+            return false;
+        }
+
+    }
 
     public void on_db_ready() {
 
@@ -100,18 +148,16 @@ public class MyApplication extends Application {
 
     }
 
-
     public void prepare_db() {
 
         try {
-            db.execSQL("CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY,name,done)");
+            db.execSQL("CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY, name, done)");
         } catch (SQLiteException ex) {
             showMessage("create table: " + ex.toString());
             db.close();
         }
 
     }
-
 
     public void showMessage(String msg){
         //Snackbar snackbar = Snackbar.make(coordinatorLayout, "Welcome to AndroidHive", Snackbar.LENGTH_LONG);
